@@ -1,0 +1,38 @@
+{
+  "name": "backend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "cross-env NODE_OPTIONS=--openssl-legacy-provider next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "ws": "cross-env HOST=localhost PORT=1234 y-websocket-server"
+  },
+  "dependencies": {
+    "@auth/prisma-adapter": "^1.6.0",
+    "@google/generative-ai": "^0.24.1",
+    "bcryptjs": "^3.0.3",
+    "firebase-admin": "^14.2.0",
+    "next": "16.2.10",
+    "next-auth": "^4.24.14",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "yjs": "^13.6.31",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@prisma/client": "^5.22.0",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "cross-env": "^10.1.0",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.10",
+    "prisma": "^5.22.0",
+    "tailwindcss": "^4",
+    "typescript": "^5",
+    "y-websocket": "^2.1.0"
+  }
+}

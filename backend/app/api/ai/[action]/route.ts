@@ -154,5 +154,5 @@ export async function POST(
   });
 
   // Reconstruct params to match withRole's expected context
-  return handler(reqClone, { params: { id: documentId } } as any);
+  return handler(new NextRequest(reqClone), { params: { id: documentId } } as any);
 }

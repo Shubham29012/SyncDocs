@@ -50,7 +50,7 @@ export default function TiptapEditor({
 
       localProvider = new YjsProvider({
         docId,
-        userId: session.user.id,
+        userId: session.user.id!,
         userName: session.user.name ?? "Anonymous",
         userImage: session.user.image ?? undefined,
         initialState: localDoc?.yjsState ?? initialYjsState,

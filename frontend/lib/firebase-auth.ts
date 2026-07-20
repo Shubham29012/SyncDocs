@@ -9,13 +9,13 @@ import {
   type Auth,
 } from "firebase/auth";
 
-import app from "./firebase";
+import { getClientApp } from "./firebase";
 
 let authInstance: Auth | null = null;
 
 export function getClientAuth(): Auth {
   if (!authInstance) {
-    authInstance = getAuth(app);
+    authInstance = getAuth(getClientApp());
   }
   return authInstance;
 }

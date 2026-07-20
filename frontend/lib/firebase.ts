@@ -11,7 +11,7 @@ const firebaseConfig = {
 
 let appInstance: FirebaseApp | null = null;
 
-function getLazyApp(): FirebaseApp {
+export function getClientApp(): FirebaseApp {
   if (!appInstance) {
     if (!firebaseConfig.apiKey) {
       throw new Error(
@@ -22,19 +22,3 @@ function getLazyApp(): FirebaseApp {
   }
   return appInstance;
 }
-
-const app = new Proxy({} as FirebaseApp, {
-  get(target, prop) {
-    if (prop === "then" || prop === "toJSON" || typeof prop === "symbol") {
-      return undefined;
-    }
-    const realApp = getLazyApp();
-    const value = Reflect.get(realApp, prop);
-    if (typeof value === "function") {
-      return value.bind(realApp);
-    }
-    return value;
-  }
-});
-
-export default app;

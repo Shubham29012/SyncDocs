@@ -1,26 +1,26 @@
 "use client";
 
-import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import Navbar from "@/components/layout/Navbar";
 import Sidebar from "@/components/layout/Sidebar";
+import { useAuth } from "@/app/contexts/AuthContext";
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { data: session, status } = useSession();
+  const { user, loading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/login");
+    if (!loading && !user) {
+      router.replace("/login");
     }
-  }, [status, router]);
+  }, [loading, user, router]);
 
-  if (status === "loading") {
+  if (loading) {
     return (
       <div
         style={{
@@ -28,18 +28,14 @@ export default function DashboardLayout({
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: "var(--bg-primary)",
         }}
       >
-        <div style={{ textAlign: "center" }}>
-          <div className="spinner" style={{ width: "32px", height: "32px", margin: "0 auto 16px" }} />
-          <p style={{ color: "var(--text-muted)", fontSize: "0.875rem" }}>Loading…</p>
-        </div>
+        Loading...
       </div>
     );
   }
 
-  if (!session) return null;
+  if (!user) return null;
 
   return (
     <div className="app-layout">

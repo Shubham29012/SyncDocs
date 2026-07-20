@@ -6,11 +6,11 @@ import { searchApi } from "@/lib/api/client";
 import { useRouter } from "next/navigation";
 import Navbar from "@/components/layout/Navbar";
 import Sidebar from "@/components/layout/Sidebar";
-import { useSession } from "next-auth/react";
+
 import { formatDistanceToNow } from "date-fns";
 
 export default function SearchPage() {
-  const { data: session } = useSession();
+
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [type, setType] = useState<"all" | "title" | "content">("all");

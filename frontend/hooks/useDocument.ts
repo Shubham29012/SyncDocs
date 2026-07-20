@@ -38,7 +38,7 @@ export function useCreateDocument() {
 export function useUpdateDocument(id: string) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (data: { title?: string; isArchived?: boolean }) =>
+    mutationFn: (data: { title?: string; isArchived?: boolean; isStarred?: boolean }) =>
       documentsApi.update(id, data),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["document", id] });

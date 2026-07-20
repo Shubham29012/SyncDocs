@@ -107,10 +107,10 @@ function TiptapEditorInner({
   editable = true,
   onWordCount,
 }: TiptapEditorInnerProps) {
-  const extensions = [
+  const extensions: any[] = [
     StarterKit.configure({
       history: false,
-    }),
+    } as any),
     Collaboration.configure({
       document: provider.ydoc,
     }),

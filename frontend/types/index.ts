@@ -25,6 +25,7 @@ export interface Document {
   title: string;
   ownerId: string;
   isArchived: boolean;
+  isStarred: boolean;
   content?: string | null; // Plain text for search and diff
   createdAt: string;
   updatedAt: string;

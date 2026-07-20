@@ -6,11 +6,35 @@ import {
   GoogleAuthProvider,
   GithubAuthProvider,
   signOut,
+  type Auth,
 } from "firebase/auth";
 
 import app from "./firebase";
 
-export const auth = getAuth(app);
+let authInstance: Auth | null = null;
+
+function getLazyAuth(): Auth {
+  if (!authInstance) {
+    authInstance = getAuth(app);
+  }
+  return authInstance;
+}
+
+export const auth = new Proxy({} as Auth, {
+  get(target, prop, receiver) {
+    if (prop === "then" || prop === "toJSON" || typeof prop === "symbol") {
+      return undefined;
+    }
+    try {
+      const auth = getLazyAuth();
+      return Reflect.get(auth, prop, receiver);
+    } catch (err) {
+      return (...args: any[]) => {
+        throw err;
+      };
+    }
+  }
+});
 
 export async function signInWithGoogle() {
   const provider = new GoogleAuthProvider();

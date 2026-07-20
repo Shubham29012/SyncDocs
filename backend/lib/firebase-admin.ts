@@ -3,7 +3,7 @@ import { getAuth } from "firebase-admin/auth";
 import fs from "fs";
 import path from "path";
 
-function getApp(): App {
+function getApp(): App | null {
   const existing = getApps();
   if (existing.length > 0) return existing[0];
 
@@ -52,31 +52,51 @@ function getApp(): App {
     }
   }
 
-  throw new Error(
-    "Missing Firebase Admin credentials. Please configure either FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, and FIREBASE_PRIVATE_KEY, or set a valid FIREBASE_SERVICE_ACCOUNT_PATH."
-  );
+  return null;
 }
 
 let appInstance: App | null = null;
-let authInstance: ReturnType<typeof getAuth> | null = null;
+let appInitAttempted = false;
+
+function getLazyApp(): App {
+  if (!appInitAttempted) {
+    appInitAttempted = true;
+    appInstance = getApp();
+  }
+  if (!appInstance) {
+    throw new Error(
+      "Missing Firebase Admin credentials. Please configure either FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, and FIREBASE_PRIVATE_KEY, or set a valid FIREBASE_SERVICE_ACCOUNT_PATH."
+    );
+  }
+  return appInstance;
+}
 
 export const firebaseAdmin = new Proxy({} as App, {
   get(target, prop, receiver) {
-    if (!appInstance) {
-      appInstance = getApp();
+    if (prop === "then" || prop === "toJSON" || typeof prop === "symbol") {
+      return undefined;
     }
-    return Reflect.get(appInstance, prop, receiver);
+    const app = getLazyApp();
+    return Reflect.get(app, prop, receiver);
   }
 });
 
+let authInstance: ReturnType<typeof getAuth> | null = null;
 export const adminAuth = new Proxy({} as ReturnType<typeof getAuth>, {
   get(target, prop, receiver) {
-    if (!authInstance) {
-      if (!appInstance) {
-        appInstance = getApp();
-      }
-      authInstance = getAuth(appInstance);
+    if (prop === "then" || prop === "toJSON" || typeof prop === "symbol") {
+      return undefined;
     }
-    return Reflect.get(authInstance, prop, receiver);
+    try {
+      const app = getLazyApp();
+      if (!authInstance) {
+        authInstance = getAuth(app);
+      }
+      return Reflect.get(authInstance, prop, receiver);
+    } catch (err) {
+      return (...args: any[]) => {
+        throw err;
+      };
+    }
   }
 });

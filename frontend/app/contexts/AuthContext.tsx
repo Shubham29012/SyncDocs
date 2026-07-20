@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { onAuthStateChanged, User } from "firebase/auth";
-import { auth } from "@/lib/firebase-auth";
+import { getClientAuth } from "@/lib/firebase-auth";
 
 type AuthContextType = {
     user: User | null;
@@ -25,7 +25,7 @@ export function AuthProvider({
     useEffect(() => {
         console.log("Auth Provider Mounted");
 
-        const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+        const unsubscribe = onAuthStateChanged(getClientAuth(), (firebaseUser) => {
             console.log("Firebase User:", firebaseUser);
 
             setUser(firebaseUser);

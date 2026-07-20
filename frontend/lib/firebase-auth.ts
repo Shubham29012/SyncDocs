@@ -13,32 +13,12 @@ import app from "./firebase";
 
 let authInstance: Auth | null = null;
 
-function getLazyAuth(): Auth {
+export function getClientAuth(): Auth {
   if (!authInstance) {
     authInstance = getAuth(app);
   }
   return authInstance;
 }
-
-export const auth = new Proxy({} as Auth, {
-  get(target, prop) {
-    if (prop === "then" || prop === "toJSON" || typeof prop === "symbol") {
-      return undefined;
-    }
-    try {
-      const realAuth = getLazyAuth();
-      const value = Reflect.get(realAuth, prop);
-      if (typeof value === "function") {
-        return value.bind(realAuth);
-      }
-      return value;
-    } catch (err) {
-      return (...args: any[]) => {
-        throw err;
-      };
-    }
-  }
-});
 
 export async function signInWithGoogle() {
   const provider = new GoogleAuthProvider();
@@ -46,7 +26,7 @@ export async function signInWithGoogle() {
   provider.addScope("email");
   provider.addScope("profile");
 
-  return signInWithPopup(auth, provider);
+  return signInWithPopup(getClientAuth(), provider);
 }
 
 export async function signInWithGitHub() {
@@ -55,23 +35,23 @@ export async function signInWithGitHub() {
   provider.addScope("read:user");
   provider.addScope("user:email");
 
-  return signInWithPopup(auth, provider);
+  return signInWithPopup(getClientAuth(), provider);
 }
 
 export async function loginWithEmail(
   email: string,
   password: string
 ) {
-  return signInWithEmailAndPassword(auth, email, password);
+  return signInWithEmailAndPassword(getClientAuth(), email, password);
 }
 
 export async function registerWithEmail(
   email: string,
   password: string
 ) {
-  return createUserWithEmailAndPassword(auth, email, password);
+  return createUserWithEmailAndPassword(getClientAuth(), email, password);
 }
 
 export async function logout() {
-  return signOut(auth);
+  return signOut(getClientAuth());
 }

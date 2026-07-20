@@ -57,7 +57,26 @@ function getApp(): App {
   );
 }
 
-const app = getApp();
+let appInstance: App | null = null;
+let authInstance: ReturnType<typeof getAuth> | null = null;
 
-export { app as firebaseAdmin };
-export const adminAuth = getAuth(app);
+export const firebaseAdmin = new Proxy({} as App, {
+  get(target, prop, receiver) {
+    if (!appInstance) {
+      appInstance = getApp();
+    }
+    return Reflect.get(appInstance, prop, receiver);
+  }
+});
+
+export const adminAuth = new Proxy({} as ReturnType<typeof getAuth>, {
+  get(target, prop, receiver) {
+    if (!authInstance) {
+      if (!appInstance) {
+        appInstance = getApp();
+      }
+      authInstance = getAuth(appInstance);
+    }
+    return Reflect.get(authInstance, prop, receiver);
+  }
+});

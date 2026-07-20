@@ -24,12 +24,16 @@ function getLazyApp(): FirebaseApp {
 }
 
 const app = new Proxy({} as FirebaseApp, {
-  get(target, prop, receiver) {
+  get(target, prop) {
     if (prop === "then" || prop === "toJSON" || typeof prop === "symbol") {
       return undefined;
     }
-    const app = getLazyApp();
-    return Reflect.get(app, prop, receiver);
+    const realApp = getLazyApp();
+    const value = Reflect.get(realApp, prop);
+    if (typeof value === "function") {
+      return value.bind(realApp);
+    }
+    return value;
   }
 });
 

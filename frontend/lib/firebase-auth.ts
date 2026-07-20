@@ -21,13 +21,17 @@ function getLazyAuth(): Auth {
 }
 
 export const auth = new Proxy({} as Auth, {
-  get(target, prop, receiver) {
+  get(target, prop) {
     if (prop === "then" || prop === "toJSON" || typeof prop === "symbol") {
       return undefined;
     }
     try {
-      const auth = getLazyAuth();
-      return Reflect.get(auth, prop, receiver);
+      const realAuth = getLazyAuth();
+      const value = Reflect.get(realAuth, prop);
+      if (typeof value === "function") {
+        return value.bind(realAuth);
+      }
+      return value;
     } catch (err) {
       return (...args: any[]) => {
         throw err;
